@@ -1,0 +1,2951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NEXUS TRADE — Secure Digital Trading Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+<style>
+/* ============================================================
+   CSS VARIABLES & RESET
+   ============================================================ */
+:root {
+  --bg-base: #020810;
+  --bg-panel: #060f1e;
+  --bg-card: #0a1628;
+  --bg-card2: #0d1d36;
+  --border: rgba(0,200,255,0.15);
+  --border-bright: rgba(0,200,255,0.45);
+  --cyan: #00c8ff;
+  --cyan-dim: rgba(0,200,255,0.6);
+  --green: #00ff88;
+  --green-dim: rgba(0,255,136,0.6);
+  --red: #ff3b5c;
+  --red-dim: rgba(255,59,92,0.6);
+  --gold: #ffd700;
+  --text-primary: #e8f4ff;
+  --text-secondary: #7a9dc0;
+  --text-dim: #3d5a7a;
+  --glow-cyan: 0 0 20px rgba(0,200,255,0.4);
+  --glow-green: 0 0 20px rgba(0,255,136,0.4);
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-display: 'Rajdhani', sans-serif;
+  --font-body: 'Exo 2', sans-serif;
+  --nav-h: 64px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg-base);
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none;}
+button{cursor:pointer;font-family:var(--font-body);}
+input,select,textarea{font-family:var(--font-body);}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg-base);}
+::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:3px;}
+
+/* ============================================================
+   NOISE OVERLAY
+   ============================================================ */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:9999;
+  opacity:0.4;
+}
+
+/* ============================================================
+   GRID BACKGROUND
+   ============================================================ */
+.grid-bg{
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+  background-size:50px 50px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+nav{
+  position:fixed;
+  top:0;left:0;right:0;
+  height:var(--nav-h);
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  padding:0 24px;
+  background:rgba(2,8,16,0.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--font-display);
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:3px;
+  color:var(--text-primary);
+  text-transform:uppercase;
+  flex-shrink:0;
+}
+.nav-logo .logo-icon{
+  width:32px;height:32px;
+  background:linear-gradient(135deg,var(--cyan),var(--green));
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+  color:#000;
+  font-weight:900;
+}
+.nav-logo span.accent{color:var(--cyan);}
+.nav-links{
+  display:flex;gap:4px;
+  margin-left:40px;
+  flex:1;
+}
+.nav-links a{
+  padding:6px 14px;
+  font-family:var(--font-display);
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--text-secondary);
+  border-radius:4px;
+  transition:all .2s;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:50%;right:50%;
+  height:2px;
+  background:var(--cyan);
+  transition:all .2s;
+}
+.nav-links a:hover,.nav-links a.active{
+  color:var(--text-primary);
+  background:rgba(0,200,255,0.06);
+}
+.nav-links a:hover::after,.nav-links a.active::after{left:14px;right:14px;}
+.nav-actions{
+  display:flex;gap:10px;
+  margin-left:auto;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 20px;
+  font-family:var(--font-display);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  border-radius:4px;
+  border:none;
+  transition:all .25s;
+}
+.btn-ghost{
+  background:transparent;
+  border:1px solid var(--border-bright);
+  color:var(--cyan);
+}
+.btn-ghost:hover{background:rgba(0,200,255,0.1);box-shadow:var(--glow-cyan);}
+.btn-primary{
+  background:linear-gradient(135deg,#0088cc,var(--cyan));
+  color:#000;
+  font-weight:800;
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:var(--glow-cyan);}
+.btn-success{
+  background:linear-gradient(135deg,#00aa55,var(--green));
+  color:#000;font-weight:800;
+}
+.btn-success:hover{transform:translateY(-1px);box-shadow:var(--glow-green);}
+.btn-danger{
+  background:linear-gradient(135deg,#cc0033,var(--red));
+  color:#fff;font-weight:800;
+}
+.btn-danger:hover{transform:translateY(-1px);}
+.btn-lg{padding:14px 32px;font-size:15px;}
+
+/* HAMBURGER */
+.hamburger{
+  display:none;
+  flex-direction:column;gap:5px;
+  cursor:pointer;padding:8px;
+  margin-left:auto;
+}
+.hamburger span{
+  width:22px;height:2px;
+  background:var(--cyan);
+  border-radius:2px;
+  transition:all .3s;
+}
+
+/* ============================================================
+   PAGES
+   ============================================================ */
+.page{
+  display:none;
+  min-height:100vh;
+  padding-top:var(--nav-h);
+  position:relative;
+  z-index:1;
+}
+.page.active{display:block;}
+
+/* ============================================================
+   HOME PAGE
+   ============================================================ */
+.hero{
+  min-height:calc(100vh - var(--nav-h));
+  display:flex;
+  align-items:center;
+  position:relative;
+  overflow:hidden;
+  padding:60px 40px;
+}
+.hero-bg{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 50%, rgba(0,136,204,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 20% 80%, rgba(0,255,136,0.07) 0%, transparent 50%);
+}
+.hero-content{
+  max-width:600px;
+  z-index:2;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 14px;
+  background:rgba(0,200,255,0.08);
+  border:1px solid var(--border-bright);
+  border-radius:20px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--cyan);
+  margin-bottom:24px;
+  letter-spacing:1px;
+}
+.hero-badge .dot{
+  width:6px;height:6px;
+  background:var(--green);
+  border-radius:50%;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:.5;transform:scale(1.4);}
+}
+.hero h1{
+  font-family:var(--font-display);
+  font-size:clamp(42px,6vw,78px);
+  font-weight:800;
+  line-height:1.05;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:20px;
+}
+.hero h1 .line1{color:var(--text-primary);}
+.hero h1 .line2{
+  background:linear-gradient(90deg,var(--cyan),var(--green));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero p{
+  color:var(--text-secondary);
+  font-size:16px;
+  max-width:480px;
+  margin-bottom:36px;
+  font-weight:300;
+}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;}
+.hero-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  margin-top:60px;
+  max-width:500px;
+}
+.hero-stat{
+  padding:16px;
+  background:rgba(10,22,40,0.8);
+  border:1px solid var(--border);
+  border-radius:6px;
+  text-align:center;
+}
+.hero-stat .val{
+  font-family:var(--font-mono);
+  font-size:22px;
+  color:var(--cyan);
+  display:block;
+}
+.hero-stat .lbl{
+  font-size:11px;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+/* Hero right side chart */
+.hero-visual{
+  position:absolute;
+  right:-20px;top:50%;
+  transform:translateY(-50%);
+  width:min(550px,50vw);
+  opacity:.9;
+}
+
+/* Market tickers */
+.ticker-bar{
+  background:var(--bg-panel);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:10px 0;
+  overflow:hidden;
+}
+.ticker-track{
+  display:flex;
+  gap:40px;
+  animation:ticker 30s linear infinite;
+  white-space:nowrap;
+}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.ticker-item{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);
+  font-size:13px;
+}
+.ticker-item .sym{color:var(--text-secondary);}
+.ticker-item .price{color:var(--text-primary);}
+.ticker-item .chg.up{color:var(--green);}
+.ticker-item .chg.down{color:var(--red);}
+
+/* Market highlights */
+.section{padding:80px 40px;max-width:1200px;margin:0 auto;}
+.section-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:40px;
+}
+.section-title{
+  font-family:var(--font-display);
+  font-size:28px;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+.section-title span{color:var(--cyan);}
+.section-subtitle{
+  color:var(--text-secondary);
+  font-size:13px;
+  font-family:var(--font-mono);
+  margin-top:4px;
+}
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
+.card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:24px;
+  transition:all .3s;
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:0;
+  transition:.3s;
+}
+.card:hover{
+  border-color:var(--border-bright);
+  transform:translateY(-3px);
+  box-shadow:0 8px 30px rgba(0,200,255,0.1);
+}
+.card:hover::before{opacity:1;}
+
+.mkt-card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.mkt-card-sym{
+  font-family:var(--font-mono);
+  font-size:15px;
+  color:var(--cyan);
+  font-weight:700;
+}
+.mkt-card-name{
+  font-size:12px;
+  color:var(--text-dim);
+}
+.mkt-card-badge{
+  padding:3px 8px;
+  border-radius:3px;
+  font-size:11px;
+  font-family:var(--font-mono);
+}
+.badge-crypto{background:rgba(0,200,255,0.1);color:var(--cyan);}
+.badge-stock{background:rgba(0,255,136,0.1);color:var(--green);}
+.badge-forex{background:rgba(255,215,0,0.1);color:var(--gold);}
+
+.mkt-price{
+  font-family:var(--font-mono);
+  font-size:26px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+.mkt-change{
+  font-family:var(--font-mono);
+  font-size:13px;
+  display:flex;align-items:center;gap:6px;
+}
+.mkt-change.up{color:var(--green);}
+.mkt-change.down{color:var(--red);}
+
+/* Sparkline */
+.sparkline{
+  margin-top:16px;
+  height:50px;
+}
+
+/* Features row */
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  margin-top:40px;
+}
+.feature-card{
+  padding:28px 24px;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  text-align:center;
+  transition:all .3s;
+}
+.feature-card:hover{
+  border-color:var(--border-bright);
+  background:var(--bg-card2);
+}
+.feature-icon{
+  width:52px;height:52px;
+  margin:0 auto 16px;
+  background:rgba(0,200,255,0.08);
+  border:1px solid var(--border-bright);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+}
+.feature-card h3{
+  font-family:var(--font-display);
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:1px;
+  margin-bottom:8px;
+}
+.feature-card p{
+  font-size:13px;
+  color:var(--text-secondary);
+}
+
+/* ============================================================
+   MARKETS PAGE
+   ============================================================ */
+.markets-tabs{
+  display:flex;gap:8px;
+  margin-bottom:30px;
+}
+.tab{
+  padding:10px 24px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:4px;
+  color:var(--text-secondary);
+  font-family:var(--font-display);
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  transition:all .2s;
+}
+.tab.active,.tab:hover{
+  background:rgba(0,200,255,0.1);
+  border-color:var(--border-bright);
+  color:var(--text-primary);
+}
+
+.market-table{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+}
+.market-table table{
+  width:100%;
+  border-collapse:collapse;
+}
+.market-table th{
+  padding:14px 20px;
+  text-align:left;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  background:rgba(0,0,0,0.3);
+  border-bottom:1px solid var(--border);
+}
+.market-table td{
+  padding:14px 20px;
+  font-family:var(--font-mono);
+  font-size:13px;
+  border-bottom:1px solid rgba(0,200,255,0.05);
+  transition:background .15s;
+}
+.market-table tr:last-child td{border-bottom:none;}
+.market-table tr:hover td{background:rgba(0,200,255,0.03);}
+.market-table td.up{color:var(--green);}
+.market-table td.down{color:var(--red);}
+.market-table td.sym{color:var(--cyan);font-weight:700;}
+
+/* Chart container */
+.chart-container{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:20px;
+  margin-bottom:20px;
+}
+.chart-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.chart-title{
+  font-family:var(--font-display);
+  font-size:18px;
+  font-weight:700;
+}
+.chart-timeframes{
+  display:flex;gap:4px;
+}
+.tf-btn{
+  padding:4px 10px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:3px;
+  color:var(--text-secondary);
+  font-family:var(--font-mono);
+  font-size:11px;
+  transition:all .2s;
+}
+.tf-btn.active,.tf-btn:hover{
+  background:rgba(0,200,255,0.1);
+  border-color:var(--cyan);
+  color:var(--cyan);
+}
+
+/* ============================================================
+   DASHBOARD PAGE
+   ============================================================ */
+.dashboard-layout{
+  display:grid;
+  grid-template-columns:300px 1fr 280px;
+  gap:20px;
+  padding:20px 24px 40px;
+  max-width:1400px;
+  margin:0 auto;
+}
+.panel{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+}
+.panel-header{
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-title{
+  font-family:var(--font-display);
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--text-secondary);
+}
+.panel-body{padding:20px;}
+
+/* Portfolio */
+.portfolio-balance{
+  text-align:center;
+  padding:24px 0 20px;
+}
+.portfolio-balance .label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  margin-bottom:6px;
+}
+.portfolio-balance .amount{
+  font-family:var(--font-mono);
+  font-size:34px;
+  font-weight:700;
+  color:var(--text-primary);
+}
+.portfolio-balance .change{
+  font-family:var(--font-mono);
+  font-size:13px;
+  margin-top:4px;
+}
+.portfolio-balance .change.up{color:var(--green);}
+
+.holdings-list{margin-top:8px;}
+.holding-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid rgba(0,200,255,0.05);
+}
+.holding-item:last-child{border-bottom:none;}
+.holding-left{display:flex;align-items:center;gap:10px;}
+.holding-icon{
+  width:34px;height:34px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;
+  font-weight:700;
+  font-family:var(--font-mono);
+}
+.holding-sym{
+  font-family:var(--font-mono);
+  font-size:13px;
+  font-weight:700;
+  color:var(--text-primary);
+}
+.holding-qty{
+  font-size:11px;
+  color:var(--text-dim);
+  font-family:var(--font-mono);
+}
+.holding-right{text-align:right;}
+.holding-val{
+  font-family:var(--font-mono);
+  font-size:13px;
+  color:var(--text-primary);
+}
+.holding-pnl{
+  font-family:var(--font-mono);
+  font-size:11px;
+}
+.holding-pnl.up{color:var(--green);}
+.holding-pnl.down{color:var(--red);}
+
+/* Trade form */
+.trade-tabs{
+  display:flex;
+  border-bottom:1px solid var(--border);
+}
+.trade-tab{
+  flex:1;
+  padding:12px;
+  background:transparent;
+  border:none;
+  font-family:var(--font-display);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  transition:all .2s;
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+}
+.trade-tab.buy.active{color:var(--green);border-bottom-color:var(--green);}
+.trade-tab.sell.active{color:var(--red);border-bottom-color:var(--red);}
+.trade-tab:hover{color:var(--text-primary);}
+
+.trade-form{padding:20px;}
+.form-group{margin-bottom:16px;}
+.form-label{
+  display:block;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  margin-bottom:6px;
+}
+.form-control{
+  width:100%;
+  padding:10px 14px;
+  background:rgba(0,0,0,0.4);
+  border:1px solid var(--border);
+  border-radius:4px;
+  color:var(--text-primary);
+  font-family:var(--font-mono);
+  font-size:14px;
+  transition:all .2s;
+  outline:none;
+}
+.form-control:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 2px rgba(0,200,255,0.1);
+}
+select.form-control{
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300c8ff' fill='none' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  padding-right:36px;
+}
+.order-summary{
+  background:rgba(0,0,0,0.3);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:14px;
+  margin:16px 0;
+}
+.order-row{
+  display:flex;justify-content:space-between;
+  font-family:var(--font-mono);
+  font-size:12px;
+  padding:4px 0;
+}
+.order-row .key{color:var(--text-dim);}
+.order-row .val{color:var(--text-primary);}
+.order-row.total .val{color:var(--cyan);font-size:14px;}
+
+/* Orderbook */
+.orderbook{font-family:var(--font-mono);font-size:12px;}
+.ob-header{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  padding:8px 12px;
+  color:var(--text-dim);
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.ob-row{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  padding:5px 12px;
+  position:relative;
+  transition:background .1s;
+}
+.ob-row:hover{background:rgba(255,255,255,0.02);}
+.ob-row .depth-bar{
+  position:absolute;
+  top:0;bottom:0;right:0;
+  opacity:0.12;
+}
+.ob-row.ask .depth-bar{background:var(--red);}
+.ob-row.bid .depth-bar{background:var(--green);}
+.ob-row.ask .price{color:var(--red);}
+.ob-row.bid .price{color:var(--green);}
+.ob-spread{
+  text-align:center;
+  padding:8px;
+  font-size:11px;
+  color:var(--text-dim);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  background:rgba(0,0,0,0.3);
+}
+
+/* ============================================================
+   AUTH PAGES (LOGIN / REGISTER)
+   ============================================================ */
+.auth-layout{
+  min-height:calc(100vh - var(--nav-h));
+  display:flex;align-items:center;justify-content:center;
+  padding:40px 20px;
+}
+.auth-card{
+  width:100%;max-width:440px;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+}
+.auth-header{
+  padding:32px 36px 24px;
+  border-bottom:1px solid var(--border);
+  text-align:center;
+}
+.auth-header .logo{
+  font-family:var(--font-display);
+  font-size:26px;
+  font-weight:800;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.auth-header .logo span{color:var(--cyan);}
+.auth-header h2{
+  font-family:var(--font-display);
+  font-size:18px;
+  font-weight:600;
+  letter-spacing:1.5px;
+  color:var(--text-secondary);
+}
+.auth-body{padding:32px 36px;}
+.auth-body .form-group{margin-bottom:20px;}
+.input-wrapper{position:relative;}
+.input-wrapper .form-control{padding-right:40px;}
+.input-icon{
+  position:absolute;right:12px;top:50%;
+  transform:translateY(-50%);
+  color:var(--text-dim);
+  font-size:16px;
+}
+.password-toggle{
+  background:none;border:none;
+  position:absolute;right:12px;top:50%;
+  transform:translateY(-50%);
+  color:var(--text-dim);
+  cursor:pointer;
+  font-size:16px;
+  padding:0;
+  transition:color .2s;
+}
+.password-toggle:hover{color:var(--cyan);}
+.strength-bar{
+  height:3px;
+  background:var(--border);
+  border-radius:2px;
+  margin-top:6px;
+  overflow:hidden;
+}
+.strength-fill{
+  height:100%;
+  width:0;
+  border-radius:2px;
+  transition:all .4s;
+}
+.twofa-section{
+  padding:16px;
+  background:rgba(0,200,255,0.05);
+  border:1px solid rgba(0,200,255,0.2);
+  border-radius:6px;
+  margin-bottom:20px;
+}
+.twofa-label{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-mono);
+  font-size:12px;
+  color:var(--cyan);
+  margin-bottom:10px;
+}
+.twofa-code{
+  display:flex;gap:8px;
+  justify-content:center;
+}
+.twofa-digit{
+  width:44px;height:50px;
+  background:rgba(0,0,0,0.4);
+  border:1px solid var(--border);
+  border-radius:6px;
+  color:var(--text-primary);
+  font-family:var(--font-mono);
+  font-size:22px;
+  text-align:center;
+  outline:none;
+  transition:all .2s;
+}
+.twofa-digit:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 2px rgba(0,200,255,0.15);
+}
+.checkbox-group{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:20px;
+}
+.checkbox-group input[type=checkbox]{
+  width:16px;height:16px;
+  accent-color:var(--cyan);
+  cursor:pointer;
+}
+.checkbox-group label{
+  font-size:13px;
+  color:var(--text-secondary);
+  cursor:pointer;
+}
+.auth-footer{
+  text-align:center;
+  padding-top:16px;
+  border-top:1px solid var(--border);
+  font-size:13px;
+  color:var(--text-secondary);
+}
+.auth-footer a{color:var(--cyan);}
+.auth-footer a:hover{text-decoration:underline;}
+
+/* Security badges */
+.security-badges{
+  display:flex;gap:8px;justify-content:center;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+.sec-badge{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px;
+  background:rgba(0,255,136,0.05);
+  border:1px solid rgba(0,255,136,0.15);
+  border-radius:20px;
+  font-size:10px;
+  color:var(--green-dim);
+  font-family:var(--font-mono);
+  letter-spacing:.5px;
+}
+
+/* ============================================================
+   SECURITY PAGE
+   ============================================================ */
+.security-hero{
+  text-align:center;
+  padding:80px 40px 60px;
+  background:radial-gradient(ellipse 60% 80% at 50% 0%, rgba(0,200,255,0.08) 0%, transparent 60%);
+}
+.shield-icon{
+  width:100px;height:100px;
+  margin:0 auto 30px;
+  position:relative;
+}
+.shield-icon svg{
+  width:100%;height:100%;
+  filter:drop-shadow(0 0 20px rgba(0,200,255,0.5));
+}
+.security-features{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:24px;
+  padding:0 40px 80px;
+  max-width:1200px;
+  margin:0 auto;
+}
+.sec-feature{
+  padding:28px;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  position:relative;
+  overflow:hidden;
+}
+.sec-feature::after{
+  content:'';
+  position:absolute;
+  top:0;right:0;
+  width:80px;height:80px;
+  background:radial-gradient(circle, rgba(0,200,255,0.06) 0%, transparent 70%);
+}
+.sec-feature-icon{
+  font-size:28px;
+  margin-bottom:14px;
+  display:block;
+}
+.sec-feature h3{
+  font-family:var(--font-display);
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  margin-bottom:10px;
+}
+.sec-feature p{
+  font-size:13px;
+  color:var(--text-secondary);
+  line-height:1.7;
+}
+.sec-status{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:12px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--green);
+}
+.sec-status::before{
+  content:'';
+  width:6px;height:6px;
+  background:var(--green);
+  border-radius:50%;
+  animation:pulse 2s infinite;
+}
+
+/* Threat Monitor */
+.threat-monitor{
+  margin:0 40px 60px;
+  max-width:1200px;
+  margin-left:auto;
+  margin-right:auto;
+  padding:0 40px;
+}
+.monitor-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-top:24px;
+}
+.monitor-stat{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:20px;
+  text-align:center;
+}
+.monitor-val{
+  font-family:var(--font-mono);
+  font-size:30px;
+  font-weight:700;
+  display:block;
+}
+.monitor-lbl{
+  font-size:11px;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  margin-top:4px;
+  display:block;
+}
+
+/* ============================================================
+   ABOUT PAGE
+   ============================================================ */
+.about-hero{
+  padding:80px 40px;
+  max-width:900px;
+  margin:0 auto;
+  text-align:center;
+}
+.about-hero h1{
+  font-family:var(--font-display);
+  font-size:clamp(36px,5vw,64px);
+  font-weight:800;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:20px;
+}
+.about-hero p{
+  font-size:16px;
+  color:var(--text-secondary);
+  max-width:660px;
+  margin:0 auto 40px;
+  line-height:1.8;
+}
+.team-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:24px;
+  padding:0 40px 80px;
+  max-width:1200px;
+  margin:0 auto;
+}
+.team-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:28px 24px;
+  text-align:center;
+}
+.team-avatar{
+  width:70px;height:70px;
+  border-radius:50%;
+  margin:0 auto 14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;
+  font-weight:800;
+  font-family:var(--font-display);
+  color:#000;
+}
+.team-name{
+  font-family:var(--font-display);
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:4px;
+}
+.team-role{
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--cyan);
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  margin-bottom:10px;
+}
+.team-bio{
+  font-size:12px;
+  color:var(--text-secondary);
+  line-height:1.6;
+}
+.trust-signals{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:20px;
+  padding:0 40px 80px;
+  max-width:1200px;
+  margin:0 auto;
+}
+.trust-item{
+  text-align:center;
+  padding:24px;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+}
+.trust-num{
+  font-family:var(--font-mono);
+  font-size:32px;
+  color:var(--cyan);
+  display:block;
+  margin-bottom:8px;
+}
+.trust-desc{
+  font-size:12px;
+  color:var(--text-secondary);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+/* ============================================================
+   SUPPORT PAGE
+   ============================================================ */
+.support-layout{
+  display:grid;
+  grid-template-columns:1fr 380px;
+  gap:30px;
+  padding:40px;
+  max-width:1200px;
+  margin:0 auto;
+}
+.faq-item{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  margin-bottom:10px;
+  overflow:hidden;
+}
+.faq-question{
+  width:100%;
+  padding:18px 20px;
+  background:transparent;
+  border:none;
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  font-size:14px;
+  font-weight:600;
+  text-align:left;
+  cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;
+  transition:background .2s;
+}
+.faq-question:hover{background:rgba(0,200,255,0.03);}
+.faq-question .arrow{
+  color:var(--cyan);
+  font-size:18px;
+  transition:transform .3s;
+  flex-shrink:0;
+}
+.faq-item.open .faq-question .arrow{transform:rotate(45deg);}
+.faq-answer{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .3s ease;
+}
+.faq-answer p{
+  padding:0 20px 18px;
+  font-size:13px;
+  color:var(--text-secondary);
+  line-height:1.7;
+}
+.faq-item.open .faq-answer{max-height:200px;}
+
+.contact-form{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:30px;
+}
+.contact-form h2{
+  font-family:var(--font-display);
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:24px;
+}
+textarea.form-control{
+  resize:vertical;
+  min-height:120px;
+}
+.captcha-box{
+  padding:14px;
+  background:rgba(0,0,0,0.4);
+  border:1px solid var(--border);
+  border-radius:6px;
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:20px;
+}
+.captcha-box input[type=checkbox]{
+  width:20px;height:20px;
+  accent-color:var(--cyan);
+  cursor:pointer;
+}
+.captcha-box label{
+  font-size:13px;
+  color:var(--text-secondary);
+  flex:1;
+}
+.captcha-icon{
+  font-size:24px;
+  opacity:.6;
+}
+
+/* ============================================================
+   SETTINGS PAGE
+   ============================================================ */
+.settings-layout{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  gap:24px;
+  padding:40px;
+  max-width:1100px;
+  margin:0 auto;
+}
+.settings-nav{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+  height:fit-content;
+}
+.settings-nav a{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 18px;
+  font-family:var(--font-display);
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--text-secondary);
+  border-bottom:1px solid var(--border);
+  transition:all .2s;
+}
+.settings-nav a:last-child{border-bottom:none;}
+.settings-nav a.active,.settings-nav a:hover{
+  color:var(--text-primary);
+  background:rgba(0,200,255,0.05);
+  padding-left:22px;
+}
+.settings-nav a .icon{font-size:16px;}
+.settings-content{display:flex;flex-direction:column;gap:20px;}
+.settings-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+}
+.settings-card .card-header{
+  padding:18px 24px;
+  border-bottom:1px solid var(--border);
+  background:rgba(0,0,0,0.2);
+}
+.settings-card .card-header h3{
+  font-family:var(--font-display);
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+.settings-card .card-body{padding:24px;}
+.toggle-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 0;
+  border-bottom:1px solid rgba(0,200,255,0.05);
+}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-info h4{
+  font-size:14px;
+  font-weight:600;
+  margin-bottom:3px;
+}
+.toggle-info p{
+  font-size:12px;
+  color:var(--text-secondary);
+}
+.toggle{
+  width:46px;height:24px;
+  background:rgba(0,0,0,0.5);
+  border:1px solid var(--border);
+  border-radius:12px;
+  cursor:pointer;
+  position:relative;
+  transition:all .3s;
+  flex-shrink:0;
+}
+.toggle.on{
+  background:rgba(0,200,255,0.2);
+  border-color:var(--cyan);
+}
+.toggle::after{
+  content:'';
+  position:absolute;
+  width:18px;height:18px;
+  border-radius:50%;
+  background:var(--text-dim);
+  top:2px;left:2px;
+  transition:all .3s;
+}
+.toggle.on::after{
+  background:var(--cyan);
+  transform:translateX(22px);
+}
+
+/* ============================================================
+   NOTIFICATION SYSTEM
+   ============================================================ */
+.notification-container{
+  position:fixed;
+  top:calc(var(--nav-h) + 12px);
+  right:20px;
+  z-index:2000;
+  display:flex;flex-direction:column;gap:10px;
+  pointer-events:none;
+}
+.notif{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 18px;
+  background:var(--bg-card2);
+  border:1px solid var(--border);
+  border-left-width:3px;
+  border-radius:6px;
+  min-width:280px;
+  max-width:360px;
+  pointer-events:all;
+  animation:slideIn .3s ease;
+  font-size:13px;
+}
+@keyframes slideIn{
+  from{transform:translateX(110%);opacity:0;}
+  to{transform:translateX(0);opacity:1;}
+}
+.notif.success{border-left-color:var(--green);}
+.notif.error{border-left-color:var(--red);}
+.notif.info{border-left-color:var(--cyan);}
+.notif.warning{border-left-color:var(--gold);}
+.notif-icon{font-size:18px;flex-shrink:0;}
+.notif-text{flex:1;}
+.notif-title{font-weight:700;margin-bottom:2px;font-family:var(--font-display);letter-spacing:.5px;}
+.notif-msg{color:var(--text-secondary);font-size:12px;}
+.notif-close{
+  background:none;border:none;
+  color:var(--text-dim);font-size:18px;
+  cursor:pointer;padding:0;
+  transition:color .2s;
+}
+.notif-close:hover{color:var(--text-primary);}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  background:var(--bg-panel);
+  border-top:1px solid var(--border);
+  padding:50px 40px 30px;
+  margin-top:auto;
+}
+.footer-grid{
+  display:grid;
+  grid-template-columns:2fr repeat(3,1fr);
+  gap:40px;
+  max-width:1200px;
+  margin:0 auto 40px;
+}
+.footer-brand .logo{
+  font-family:var(--font-display);
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+.footer-brand .logo span{color:var(--cyan);}
+.footer-brand p{
+  font-size:13px;
+  color:var(--text-secondary);
+  max-width:280px;
+  line-height:1.7;
+}
+.footer-col h4{
+  font-family:var(--font-display);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--text-secondary);
+  margin-bottom:16px;
+}
+.footer-col a{
+  display:block;
+  font-size:13px;
+  color:var(--text-dim);
+  margin-bottom:8px;
+  transition:color .2s;
+}
+.footer-col a:hover{color:var(--cyan);}
+.footer-bottom{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-top:24px;
+  border-top:1px solid var(--border);
+  font-size:12px;
+  color:var(--text-dim);
+  max-width:1200px;
+  margin:0 auto;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:1100px){
+  .dashboard-layout{grid-template-columns:1fr;max-width:700px;}
+  .monitor-grid{grid-template-columns:repeat(2,1fr);}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:768px){
+  .nav-links,.nav-actions{display:none;}
+  .hamburger{display:flex;}
+  .hero{padding:40px 20px;}
+  .hero-visual{display:none;}
+  .hero-stats{grid-template-columns:repeat(3,1fr);gap:10px;}
+  .section{padding:50px 20px;}
+  .support-layout{grid-template-columns:1fr;}
+  .settings-layout{grid-template-columns:1fr;}
+  .settings-nav{display:flex;flex-wrap:wrap;gap:0;}
+  .settings-nav a{border-right:1px solid var(--border);flex:1 1 120px;}
+  .footer-grid{grid-template-columns:1fr;}
+  .footer-bottom{flex-direction:column;text-align:center;}
+  .hero h1{font-size:38px;}
+  .hero-stats{display:none;}
+  .auth-body{padding:24px 20px;}
+  .auth-header{padding:24px 20px 16px;}
+  .markets-section .section{padding:20px;}
+}
+@media(max-width:480px){
+  nav{padding:0 16px;}
+  .hero{padding:30px 16px;}
+  .monitor-grid{grid-template-columns:1fr 1fr;}
+  .security-features{padding:0 16px 50px;}
+  .team-grid,.trust-signals{padding:0 16px 50px;}
+  .support-layout,.settings-layout{padding:16px;}
+  footer{padding:40px 16px 24px;}
+}
+
+/* Mobile nav drawer */
+.mobile-nav{
+  position:fixed;
+  top:var(--nav-h);left:0;right:0;bottom:0;
+  background:rgba(2,8,16,0.98);
+  z-index:999;
+  display:none;
+  flex-direction:column;
+  padding:20px;
+  gap:8px;
+  backdrop-filter:blur(20px);
+}
+.mobile-nav.open{display:flex;}
+.mobile-nav a{
+  display:block;
+  padding:16px 20px;
+  font-family:var(--font-display);
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--text-secondary);
+  border:1px solid var(--border);
+  border-radius:6px;
+  transition:all .2s;
+}
+.mobile-nav a:hover,.mobile-nav a.active{
+  color:var(--text-primary);
+  border-color:var(--border-bright);
+  background:rgba(0,200,255,0.06);
+  padding-left:24px;
+}
+
+/* Mini sparkline canvas */
+canvas.sparkline{
+  width:100%;
+  height:50px;
+}
+
+/* Price blink */
+@keyframes priceBlink{
+  0%{opacity:1;}50%{opacity:.3;}100%{opacity:1;}
+}
+.price-update{animation:priceBlink .3s ease;}
+
+/* Page transition */
+.page{
+  animation:fadeIn .3s ease;
+}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(8px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* Scan line animation for chart */
+@keyframes scanline{
+  from{top:0;}to{top:100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- Background grid -->
+<div class="grid-bg"></div>
+
+<!-- Notification container -->
+<div class="notification-container" id="notifContainer"></div>
+
+<!-- Mobile nav drawer -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#" onclick="navigate('home')" class="active">⌂ Home</a>
+  <a href="#" onclick="navigate('markets')">◈ Markets</a>
+  <a href="#" onclick="navigate('dashboard')">⬡ Dashboard</a>
+  <a href="#" onclick="navigate('security')">⛨ Security</a>
+  <a href="#" onclick="navigate('about')">◉ About</a>
+  <a href="#" onclick="navigate('support')">◎ Support</a>
+  <a href="#" onclick="navigate('login')">→ Login</a>
+</div>
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-icon">N</div>
+    <span>NEX<span class="accent">US</span></span>
+  </div>
+  <div class="nav-links">
+    <a href="#" onclick="navigate('home')" id="nav-home" class="active">Home</a>
+    <a href="#" onclick="navigate('markets')" id="nav-markets">Markets</a>
+    <a href="#" onclick="navigate('dashboard')" id="nav-dashboard">Dashboard</a>
+    <a href="#" onclick="navigate('security')" id="nav-security">Security</a>
+    <a href="#" onclick="navigate('about')" id="nav-about">About</a>
+    <a href="#" onclick="navigate('support')" id="nav-support">Support</a>
+    <a href="#" onclick="navigate('settings')" id="nav-settings">Settings</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn btn-ghost" onclick="navigate('login')">Login</button>
+    <button class="btn btn-primary" onclick="navigate('register')">Get Started</button>
+  </div>
+  <!-- Hamburger for mobile -->
+  <div class="hamburger" id="hamburger" onclick="toggleMobileNav()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HOME PAGE
+     ============================================================ -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge"><span class="dot"></span>LIVE TRADING — 127,493 ACTIVE USERS</div>
+      <h1>
+        <div class="line1">TRADE WITH</div>
+        <div class="line2">CONFIDENCE</div>
+      </h1>
+      <p>Next-generation trading platform secured with military-grade encryption. Access crypto, stocks, and forex markets with real-time analytics and zero-compromise security.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary btn-lg" onclick="navigate('register')">Start Trading →</button>
+        <button class="btn btn-ghost btn-lg" onclick="navigate('markets')">View Markets</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="val">$2.4B</span><span class="lbl">Volume 24h</span></div>
+        <div class="hero-stat"><span class="val">340+</span><span class="lbl">Assets</span></div>
+        <div class="hero-stat"><span class="val">99.9%</span><span class="lbl">Uptime</span></div>
+      </div>
+    </div>
+    <!-- Animated chart on right -->
+    <div class="hero-visual">
+      <svg viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="heroGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#00c8ff" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#00c8ff" stop-opacity="0"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Grid lines -->
+        <line x1="0" y1="64" x2="520" y2="64" stroke="rgba(0,200,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="128" x2="520" y2="128" stroke="rgba(0,200,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="192" x2="520" y2="192" stroke="rgba(0,200,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="256" x2="520" y2="256" stroke="rgba(0,200,255,0.05)" stroke-width="1"/>
+        <!-- Chart area fill -->
+        <path d="M0,220 C40,200 80,180 120,160 C160,140 180,170 220,150 C260,130 280,90 320,80 C360,70 380,100 420,70 C460,40 490,50 520,30 L520,320 L0,320 Z" fill="url(#heroGrad)"/>
+        <!-- Chart line -->
+        <path d="M0,220 C40,200 80,180 120,160 C160,140 180,170 220,150 C260,130 280,90 320,80 C360,70 380,100 420,70 C460,40 490,50 520,30" fill="none" stroke="#00c8ff" stroke-width="2.5" filter="url(#glow)"/>
+        <!-- Candles -->
+        <g opacity="0.6">
+          <rect x="30" y="180" width="8" height="40" fill="#00ff88" rx="1"/>
+          <line x1="34" y1="175" x2="34" y2="225" stroke="#00ff88" stroke-width="1.5"/>
+          <rect x="70" y="160" width="8" height="35" fill="#00ff88" rx="1"/>
+          <line x1="74" y1="152" x2="74" y2="200" stroke="#00ff88" stroke-width="1.5"/>
+          <rect x="110" y="145" width="8" height="30" fill="#ff3b5c" rx="1"/>
+          <line x1="114" y1="138" x2="114" y2="180" stroke="#ff3b5c" stroke-width="1.5"/>
+          <rect x="150" y="150" width="8" height="35" fill="#00ff88" rx="1"/>
+          <line x1="154" y1="143" x2="154" y2="190" stroke="#00ff88" stroke-width="1.5"/>
+          <rect x="190" y="120" width="8" height="45" fill="#ff3b5c" rx="1"/>
+          <line x1="194" y1="110" x2="194" y2="170" stroke="#ff3b5c" stroke-width="1.5"/>
+          <rect x="230" y="95" width="8" height="35" fill="#00ff88" rx="1"/>
+          <line x1="234" y1="88" x2="234" y2="135" stroke="#00ff88" stroke-width="1.5"/>
+          <rect x="270" y="70" width="8" height="30" fill="#00ff88" rx="1"/>
+          <line x1="274" y1="62" x2="274" y2="105" stroke="#00ff88" stroke-width="1.5"/>
+          <rect x="310" y="60" width="8" height="40" fill="#ff3b5c" rx="1"/>
+          <line x1="314" y1="52" x2="314" y2="105" stroke="#ff3b5c" stroke-width="1.5"/>
+          <rect x="350" y="50" width="8" height="35" fill="#00ff88" rx="1"/>
+          <line x1="354" y1="42" x2="354" y2="90" stroke="#00ff88" stroke-width="1.5"/>
+        </g>
+        <!-- Price label -->
+        <rect x="390" y="20" width="120" height="28" rx="4" fill="rgba(0,200,255,0.15)" stroke="rgba(0,200,255,0.4)" stroke-width="1"/>
+        <text x="450" y="39" text-anchor="middle" font-family="'Share Tech Mono'" font-size="14" fill="#00c8ff">BTC $67,420</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Ticker bar -->
+  <div class="ticker-bar">
+    <div class="ticker-track" id="tickerTrack">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+  <!-- Market Highlights -->
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Market <span>Highlights</span></div>
+        <div class="section-subtitle">// REAL-TIME_DATA.FEED</div>
+      </div>
+      <button class="btn btn-ghost" onclick="navigate('markets')">View All →</button>
+    </div>
+    <div class="cards-grid" id="highlightCards"></div>
+  </div>
+
+  <!-- Features -->
+  <div class="section" style="padding-top:0">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Why Choose <span>NEXUS</span></div>
+        <div class="section-subtitle">// PLATFORM_ADVANTAGES</div>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>Military-Grade Security</h3>
+        <p>256-bit AES encryption, 2FA, anti-phishing protection and real-time threat monitoring.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Ultra-Low Latency</h3>
+        <p>Sub-millisecond order execution with co-located servers across 12 global data centers.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Advanced Analytics</h3>
+        <p>Professional charting tools, technical indicators, and AI-powered market insights.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3>340+ Assets</h3>
+        <p>Trade crypto, stocks, forex, and commodities all from a single unified platform.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔔</div>
+        <h3>Smart Alerts</h3>
+        <p>Configure custom price alerts, portfolio notifications, and automated trading triggers.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💎</div>
+        <h3>Zero Hidden Fees</h3>
+        <p>Transparent pricing with industry-leading low spreads and no hidden commissions.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">NEX<span>US</span> TRADE</div>
+        <p>The most secure and advanced trading platform for professional and retail traders worldwide.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a href="#" onclick="navigate('markets')">Markets</a>
+        <a href="#" onclick="navigate('dashboard')">Dashboard</a>
+        <a href="#" onclick="navigate('settings')">Settings</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#" onclick="navigate('about')">About Us</a>
+        <a href="#" onclick="navigate('security')">Security</a>
+        <a href="#" onclick="navigate('support')">Support</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">Compliance</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 NEXUS TRADE — All rights reserved.</span>
+      <span style="color:var(--text-dim);font-family:var(--font-mono);font-size:11px;">SECURED BY 256-BIT AES • SOC2 CERTIFIED • ISO 27001</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ============================================================
+     MARKETS PAGE
+     ============================================================ -->
+<div class="page" id="page-markets">
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title"><span>Markets</span> Overview</div>
+        <div class="section-subtitle">// LIVE_PRICE_FEED — UPDATING EVERY 3s</div>
+      </div>
+    </div>
+
+    <!-- Main chart -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">BTC / USDT <span style="color:var(--green);font-family:var(--font-mono);font-size:14px;margin-left:10px;" id="mktChartPrice">$67,420.50</span></div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim);">BITCOIN — BINANCE SPOT</div>
+        </div>
+        <div class="chart-timeframes">
+          <button class="tf-btn active">1M</button>
+          <button class="tf-btn">5M</button>
+          <button class="tf-btn">1H</button>
+          <button class="tf-btn">4H</button>
+          <button class="tf-btn">1D</button>
+          <button class="tf-btn">1W</button>
+        </div>
+      </div>
+      <!-- SVG chart -->
+      <svg id="mainChart" viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;"></svg>
+    </div>
+
+    <!-- Tabs -->
+    <div class="markets-tabs">
+      <button class="tab active" onclick="filterMarket('all',this)">All</button>
+      <button class="tab" onclick="filterMarket('crypto',this)">Crypto</button>
+      <button class="tab" onclick="filterMarket('stock',this)">Stocks</button>
+      <button class="tab" onclick="filterMarket('forex',this)">Forex</button>
+    </div>
+
+    <!-- Market table -->
+    <div class="market-table">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Asset</th>
+            <th>Price</th>
+            <th>24h Change</th>
+            <th>24h High</th>
+            <th>24h Low</th>
+            <th>Volume</th>
+            <th>Category</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="marketTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer style="margin-top:0">
+    <div class="footer-bottom" style="border-top:1px solid var(--border);padding-top:24px;">
+      <span>© 2026 NEXUS TRADE</span>
+      <span style="color:var(--text-dim);font-family:var(--font-mono);font-size:11px;">PRICES ARE SIMULATED FOR DEMO PURPOSES</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ============================================================
+     DASHBOARD PAGE
+     ============================================================ -->
+<div class="page" id="page-dashboard">
+  <div class="dashboard-layout">
+    <!-- Portfolio column -->
+    <div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Portfolio</span>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--green);">● LIVE</span>
+        </div>
+        <div style="padding:0 20px 20px;">
+          <div class="portfolio-balance">
+            <div class="label">Total Balance</div>
+            <div class="amount" id="portfolioBalance">$24,837.50</div>
+            <div class="change up" id="portfolioChange">+$1,243.20 (+5.26%) TODAY</div>
+          </div>
+          <div class="holdings-list" id="holdingsList"></div>
+        </div>
+      </div>
+
+      <!-- Order history -->
+      <div class="panel" style="margin-top:20px;">
+        <div class="panel-header">
+          <span class="panel-title">Recent Orders</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:12px;">
+            <thead>
+              <tr>
+                <th style="padding:10px 16px;text-align:left;color:var(--text-dim);font-size:10px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);">Pair</th>
+                <th style="padding:10px 16px;text-align:left;color:var(--text-dim);font-size:10px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);">Side</th>
+                <th style="padding:10px 16px;text-align:right;color:var(--text-dim);font-size:10px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);">Amount</th>
+                <th style="padding:10px 16px;text-align:right;color:var(--text-dim);font-size:10px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);">Status</th>
+              </tr>
+            </thead>
+            <tbody id="orderHistory"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main chart column -->
+    <div>
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <select class="form-control" id="dashPairSelect" style="width:auto;padding:6px 30px 6px 10px;font-size:13px;" onchange="updateDashChart()">
+              <option>BTC/USDT</option>
+              <option>ETH/USDT</option>
+              <option>SOL/USDT</option>
+              <option>AAPL/USD</option>
+              <option>EUR/USD</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;" id="dashPrice">$67,420.50</div>
+            <span style="font-family:var(--font-mono);font-size:13px;color:var(--green);align-self:flex-end;padding-bottom:2px;" id="dashChange">+2.34%</span>
+          </div>
+        </div>
+        <div style="padding:0 0 4px;">
+          <svg id="dashChart" viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;"></svg>
+        </div>
+      </div>
+
+      <!-- Orderbook -->
+      <div class="panel" style="margin-top:20px;">
+        <div class="panel-header">
+          <span class="panel-title">Order Book</span>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim);">BTC/USDT</span>
+        </div>
+        <div class="orderbook">
+          <div class="ob-header">
+            <span>Price (USDT)</span>
+            <span style="text-align:center;">Amount (BTC)</span>
+            <span style="text-align:right;">Total</span>
+          </div>
+          <div id="obAsks"></div>
+          <div class="ob-spread" id="obSpread">Spread: $12.40 (0.018%)</div>
+          <div id="obBids"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trade form column -->
+    <div>
+      <div class="panel">
+        <div class="trade-tabs">
+          <button class="trade-tab buy active" onclick="switchTradeTab('buy',this)">Buy</button>
+          <button class="trade-tab sell" onclick="switchTradeTab('sell',this)">Sell</button>
+        </div>
+        <div class="trade-form">
+          <div class="form-group">
+            <label class="form-label">Order Type</label>
+            <select class="form-control" id="orderType" onchange="updateOrderSummary()">
+              <option>Market Order</option>
+              <option>Limit Order</option>
+              <option>Stop Loss</option>
+              <option>Take Profit</option>
+            </select>
+          </div>
+          <div class="form-group" id="limitPriceGroup" style="display:none;">
+            <label class="form-label">Limit Price (USDT)</label>
+            <input type="number" class="form-control" id="limitPrice" value="67000" oninput="updateOrderSummary()"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Amount (BTC)</label>
+            <input type="number" class="form-control" id="tradeAmount" value="0.01" step="0.001" min="0.001" oninput="updateOrderSummary()"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Available</label>
+            <div style="font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);padding:8px 0;">$8,420.00 USDT</div>
+          </div>
+          <!-- Percentage quick buttons -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px;">
+            <button class="tf-btn" onclick="setPercent(25)">25%</button>
+            <button class="tf-btn" onclick="setPercent(50)">50%</button>
+            <button class="tf-btn" onclick="setPercent(75)">75%</button>
+            <button class="tf-btn" onclick="setPercent(100)">MAX</button>
+          </div>
+          <div class="order-summary" id="orderSummary">
+            <div class="order-row"><span class="key">Price</span><span class="val" id="sumPrice">Market</span></div>
+            <div class="order-row"><span class="key">Amount</span><span class="val" id="sumAmount">0.01 BTC</span></div>
+            <div class="order-row"><span class="key">Fee (0.1%)</span><span class="val" id="sumFee">$6.74</span></div>
+            <div class="order-row total"><span class="key">Total</span><span class="val" id="sumTotal">$674.21</span></div>
+          </div>
+          <button class="btn btn-success" id="buyBtn" onclick="placeOrder()" style="width:100%;padding:14px;">Place Buy Order</button>
+        </div>
+      </div>
+
+      <!-- Price alerts -->
+      <div class="panel" style="margin-top:20px;">
+        <div class="panel-header">
+          <span class="panel-title">Price Alerts</span>
+          <button class="btn btn-ghost" style="padding:4px 12px;font-size:11px;" onclick="addAlert()">+ ADD</button>
+        </div>
+        <div style="padding:16px;" id="alertsList">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,200,255,0.05);font-family:var(--font-mono);font-size:12px;">
+            <span style="color:var(--cyan);">BTC &gt; $70,000</span>
+            <span style="color:var(--gold);">⚠ PENDING</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-family:var(--font-mono);font-size:12px;">
+            <span style="color:var(--cyan);">ETH &lt; $3,000</span>
+            <span style="color:var(--text-dim);">INACTIVE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     LOGIN PAGE
+     ============================================================ -->
+<div class="page" id="page-login">
+  <div class="auth-layout">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo">NEX<span>US</span></div>
+        <h2>Secure Login</h2>
+      </div>
+      <div class="auth-body">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <div class="input-wrapper">
+            <input type="email" class="form-control" id="loginEmail" placeholder="trader@nexus.io" autocomplete="email"/>
+            <span class="input-icon">✉</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-wrapper">
+            <input type="password" class="form-control" id="loginPass" placeholder="••••••••••••" autocomplete="current-password"/>
+            <button class="password-toggle" onclick="togglePass('loginPass',this)" type="button">👁</button>
+          </div>
+        </div>
+
+        <!-- 2FA section -->
+        <div class="twofa-section">
+          <div class="twofa-label">🔐 Two-Factor Authentication</div>
+          <div class="twofa-code">
+            <input type="text" class="twofa-digit" maxlength="1" oninput="nextDigit(this,0)"/>
+            <input type="text" class="twofa-digit" maxlength="1" oninput="nextDigit(this,1)"/>
+            <input type="text" class="twofa-digit" maxlength="1" oninput="nextDigit(this,2)"/>
+            <input type="text" class="twofa-digit" maxlength="1" oninput="nextDigit(this,3)"/>
+            <input type="text" class="twofa-digit" maxlength="1" oninput="nextDigit(this,4)"/>
+            <input type="text" class="twofa-digit" maxlength="1" oninput="nextDigit(this,5)"/>
+          </div>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="remember"/>
+          <label for="remember">Remember this device for 30 days</label>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;padding:13px;" onclick="handleLogin()">Login Securely →</button>
+
+        <div class="security-badges">
+          <span class="sec-badge">🔒 HTTPS</span>
+          <span class="sec-badge">⚡ RATE LIMITED</span>
+          <span class="sec-badge">🛡 XSS PROTECTED</span>
+        </div>
+
+        <div class="auth-footer" style="margin-top:20px;">
+          <a href="#">Forgot password?</a> &nbsp;·&nbsp;
+          Don't have an account? <a href="#" onclick="navigate('register')">Register</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     REGISTER PAGE
+     ============================================================ -->
+<div class="page" id="page-register">
+  <div class="auth-layout">
+    <div class="auth-card" style="max-width:480px;">
+      <div class="auth-header">
+        <div class="logo">NEX<span>US</span></div>
+        <h2>Create Account</h2>
+      </div>
+      <div class="auth-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-control" placeholder="John"/>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-control" placeholder="Doe"/>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label class="form-label">Email Address</label>
+          <div class="input-wrapper">
+            <input type="email" class="form-control" placeholder="trader@nexus.io"/>
+            <span class="input-icon">✉</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-wrapper">
+            <input type="password" class="form-control" id="regPass" placeholder="Min. 12 characters" oninput="checkStrength(this.value)"/>
+            <button class="password-toggle" onclick="togglePass('regPass',this)" type="button">👁</button>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:4px;" id="strengthLabel">Password strength</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" class="form-control" placeholder="Re-enter password"/>
+        </div>
+
+        <!-- 2FA setup -->
+        <div class="twofa-section">
+          <div class="twofa-label">🔐 Enable Two-Factor Authentication</div>
+          <p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">Strongly recommended. Scan this QR code with your authenticator app.</p>
+          <!-- Fake QR code SVG -->
+          <svg viewBox="0 0 100 100" style="width:80px;height:80px;display:block;margin:0 auto;border:2px solid var(--border);padding:4px;border-radius:4px;">
+            <rect width="100" height="100" fill="#fff"/>
+            <rect x="10" y="10" width="30" height="30" fill="#000" rx="2"/>
+            <rect x="15" y="15" width="20" height="20" fill="#fff"/>
+            <rect x="18" y="18" width="14" height="14" fill="#000"/>
+            <rect x="60" y="10" width="30" height="30" fill="#000" rx="2"/>
+            <rect x="65" y="15" width="20" height="20" fill="#fff"/>
+            <rect x="68" y="18" width="14" height="14" fill="#000"/>
+            <rect x="10" y="60" width="30" height="30" fill="#000" rx="2"/>
+            <rect x="15" y="65" width="20" height="20" fill="#fff"/>
+            <rect x="18" y="68" width="14" height="14" fill="#000"/>
+            <rect x="48" y="48" width="6" height="6" fill="#000"/>
+            <rect x="56" y="48" width="6" height="6" fill="#000"/>
+            <rect x="64" y="48" width="6" height="6" fill="#000"/>
+            <rect x="48" y="56" width="6" height="6" fill="#000"/>
+            <rect x="64" y="56" width="6" height="6" fill="#000"/>
+            <rect x="48" y="64" width="6" height="6" fill="#000"/>
+            <rect x="56" y="64" width="6" height="6" fill="#000"/>
+            <rect x="72" y="56" width="8" height="8" fill="#000"/>
+            <rect x="82" y="64" width="8" height="8" fill="#000"/>
+          </svg>
+        </div>
+
+        <!-- CAPTCHA -->
+        <div class="captcha-box">
+          <input type="checkbox" id="captchaCheck" onchange="checkCaptcha(this)"/>
+          <label for="captchaCheck">I'm not a robot</label>
+          <span class="captcha-icon">🤖</span>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="terms"/>
+          <label for="terms">I agree to the <a href="#" style="color:var(--cyan)">Terms of Service</a> and <a href="#" style="color:var(--cyan)">Privacy Policy</a></label>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%;padding:13px;" onclick="handleRegister()">Create Secure Account →</button>
+
+        <div class="auth-footer" style="margin-top:16px;">
+          Already have an account? <a href="#" onclick="navigate('login')">Login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECURITY PAGE
+     ============================================================ -->
+<div class="page" id="page-security">
+  <div class="security-hero">
+    <div class="shield-icon">
+      <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="shieldGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#00c8ff"/>
+            <stop offset="100%" stop-color="#00ff88"/>
+          </linearGradient>
+        </defs>
+        <path d="M50 5 L90 20 L90 60 C90 85 70 105 50 115 C30 105 10 85 10 60 L10 20 Z" fill="none" stroke="url(#shieldGrad)" stroke-width="3"/>
+        <path d="M50 15 L82 28 L82 60 C82 80 65 98 50 107 C35 98 18 80 18 60 L18 28 Z" fill="rgba(0,200,255,0.08)"/>
+        <path d="M35 58 L46 70 L65 46" stroke="url(#shieldGrad)" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1 style="font-family:var(--font-display);font-size:clamp(36px,5vw,56px);font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;">
+      <span style="color:var(--cyan)">BANK-GRADE</span> SECURITY
+    </h1>
+    <p style="color:var(--text-secondary);font-size:16px;max-width:560px;margin:0 auto;">
+      Your assets and data are protected by multiple layers of enterprise-grade security infrastructure.
+    </p>
+  </div>
+
+  <div class="security-features">
+    <div class="sec-feature">
+      <span class="sec-feature-icon">🔐</span>
+      <h3>End-to-End Encryption</h3>
+      <p>All data transmitted between your browser and our servers is protected with TLS 1.3 and 256-bit AES encryption. Your financial data is never exposed in transit.</p>
+      <div class="sec-status">ACTIVE — TLS 1.3 / AES-256</div>
+    </div>
+    <div class="sec-feature">
+      <span class="sec-feature-icon">📱</span>
+      <h3>Two-Factor Authentication</h3>
+      <p>Mandatory 2FA using TOTP (Time-based One-Time Passwords) compatible with Google Authenticator, Authy, and hardware security keys (FIDO2/WebAuthn).</p>
+      <div class="sec-status">ACTIVE — TOTP + FIDO2</div>
+    </div>
+    <div class="sec-feature">
+      <span class="sec-feature-icon">🎣</span>
+      <h3>Anti-Phishing Protection</h3>
+      <p>Personalized anti-phishing codes on all emails, domain-locked sessions, and real-time phishing URL detection powered by our threat intelligence network.</p>
+      <div class="sec-status">ACTIVE — THREAT INTEL FEED</div>
+    </div>
+    <div class="sec-feature">
+      <span class="sec-feature-icon">👁️</span>
+      <h3>Account Activity Monitoring</h3>
+      <p>24/7 behavioral analytics detect anomalous login patterns. Instant alerts for new device logins, unusual locations, and suspicious transaction patterns.</p>
+      <div class="sec-status">MONITORING — 24/7 ACTIVE</div>
+    </div>
+    <div class="sec-feature">
+      <span class="sec-feature-icon">🚧</span>
+      <h3>Rate Limiting & Brute Force Protection</h3>
+      <p>Intelligent rate limiting blocks brute force attacks after 5 failed attempts. Progressive lockout with CAPTCHA challenge and IP-based banning for repeat offenders.</p>
+      <div class="sec-status">ACTIVE — 5 ATTEMPT LIMIT</div>
+    </div>
+    <div class="sec-feature">
+      <span class="sec-feature-icon">💉</span>
+      <h3>XSS & SQL Injection Prevention</h3>
+      <p>All user inputs are sanitized and parameterized queries prevent SQL injection. Content Security Policy (CSP) headers block cross-site scripting at the browser level.</p>
+      <div class="sec-status">ACTIVE — CSP ENFORCED</div>
+    </div>
+    <div class="sec-feature">
+      <span class="sec-feature-icon">🔑</span>
+      <h3>Secure Password Hashing</h3>
+      <p>Passwords are hashed using bcrypt with cost factor 12. Salt rounds prevent rainbow table attacks. Passwords are never stored or logged in plain text.</p>
+      <div class="sec-status">ACTIVE — BCRYPT CF-12</div>
+    </div>
+    <div class="sec-feature">
+      <span class="sec-feature-icon">🍪</span>
+      <h3>Secure Session Management</h3>
+      <p>HttpOnly and SameSite=Strict cookies prevent session hijacking. Sessions expire after 30 minutes of inactivity with automatic re-authentication required.</p>
+      <div class="sec-status">ACTIVE — SAMESITE STRICT</div>
+    </div>
+  </div>
+
+  <!-- Live threat monitor -->
+  <div style="padding:0 40px 60px;max-width:1200px;margin:0 auto;">
+    <div style="margin-bottom:24px;">
+      <div class="section-title">Live Threat <span>Monitor</span></div>
+      <div class="section-subtitle">// SECURITY_OPERATIONS_CENTER — REAL-TIME</div>
+    </div>
+    <div class="monitor-grid">
+      <div class="monitor-stat">
+        <span class="monitor-val" style="color:var(--green);" id="mon1">99.9%</span>
+        <span class="monitor-lbl">Platform Uptime</span>
+      </div>
+      <div class="monitor-stat">
+        <span class="monitor-val" style="color:var(--red);" id="mon2">0</span>
+        <span class="monitor-lbl">Active Threats</span>
+      </div>
+      <div class="monitor-stat">
+        <span class="monitor-val" style="color:var(--cyan);" id="mon3">12,847</span>
+        <span class="monitor-lbl">Blocked Attacks Today</span>
+      </div>
+      <div class="monitor-stat">
+        <span class="monitor-val" style="color:var(--gold);" id="mon4">3ms</span>
+        <span class="monitor-lbl">Avg. Response Time</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ABOUT PAGE
+     ============================================================ -->
+<div class="page" id="page-about">
+  <div class="about-hero">
+    <h1>Building the <span style="background:linear-gradient(90deg,var(--cyan),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Future</span> of Trading</h1>
+    <p>NEXUS TRADE was founded in 2019 by a team of veteran traders, security engineers, and fintech innovators united by a single mission: to make professional trading accessible, transparent, and secure for everyone.</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-lg" onclick="navigate('register')">Join Our Platform</button>
+      <button class="btn btn-ghost btn-lg" onclick="navigate('security')">Our Security</button>
+    </div>
+  </div>
+
+  <div style="padding:0 40px 20px;max-width:1200px;margin:0 auto;">
+    <div class="section-title">Meet the <span>Team</span></div>
+    <div class="section-subtitle" style="margin-bottom:30px;">// LEADERSHIP_TEAM</div>
+  </div>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-avatar" style="background:linear-gradient(135deg,#0088cc,#00c8ff);">AK</div>
+      <div class="team-name">Alex Kovacs</div>
+      <div class="team-role">CEO & Co-Founder</div>
+      <div class="team-bio">15 years trading derivatives at Goldman Sachs. MIT Computer Science graduate. Passionate about democratizing financial markets.</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar" style="background:linear-gradient(135deg,#00aa55,#00ff88);">SR</div>
+      <div class="team-name">Sarah Renn</div>
+      <div class="team-role">CTO & Co-Founder</div>
+      <div class="team-bio">Former principal engineer at Binance and Coinbase. Architect of high-frequency trading systems processing millions of orders per second.</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar" style="background:linear-gradient(135deg,#cc0033,#ff3b5c);">MP</div>
+      <div class="team-name">Marcus Pierce</div>
+      <div class="team-role">Chief Security Officer</div>
+      <div class="team-bio">Ex-NSA cryptographer and penetration tester. Author of 3 cybersecurity patents. Responsible for NEXUS's zero-breach security record.</div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar" style="background:linear-gradient(135deg,#886600,#ffd700);">LW</div>
+      <div class="team-name">Laura Wong</div>
+      <div class="team-role">Head of Compliance</div>
+      <div class="team-bio">JD from Harvard Law. Former SEC regulatory counsel. Ensures NEXUS operates within all international financial regulations.</div>
+    </div>
+  </div>
+
+  <div style="padding:40px 40px 20px;max-width:1200px;margin:0 auto;">
+    <div class="section-title">Our <span>Numbers</span></div>
+    <div class="section-subtitle" style="margin-bottom:30px;">// PLATFORM_STATISTICS</div>
+  </div>
+  <div class="trust-signals">
+    <div class="trust-item"><span class="trust-num">127K+</span><span class="trust-desc">Active Traders</span></div>
+    <div class="trust-item"><span class="trust-num">$2.4B</span><span class="trust-desc">Daily Volume</span></div>
+    <div class="trust-item"><span class="trust-num">340+</span><span class="trust-desc">Trading Pairs</span></div>
+    <div class="trust-item"><span class="trust-num">52</span><span class="trust-desc">Countries Served</span></div>
+    <div class="trust-item"><span class="trust-num">0</span><span class="trust-desc">Security Breaches</span></div>
+    <div class="trust-item"><span class="trust-num">99.9%</span><span class="trust-desc">Platform Uptime</span></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SUPPORT PAGE
+     ============================================================ -->
+<div class="page" id="page-support">
+  <div class="section" style="padding-bottom:20px;">
+    <div class="section-title">Support <span>Center</span></div>
+    <div class="section-subtitle">// HELP_DESK — RESPONSE TIME &lt; 2H</div>
+  </div>
+
+  <div class="support-layout">
+    <!-- FAQ -->
+    <div>
+      <h2 style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">Frequently Asked <span style="color:var(--cyan)">Questions</span></h2>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)"><span>How do I enable Two-Factor Authentication?</span><span class="arrow">+</span></button>
+        <div class="faq-answer"><p>Navigate to Settings → Security → Two-Factor Authentication. Scan the QR code with Google Authenticator or Authy. Enter the 6-digit code to confirm. 2FA is required for all withdrawals by default.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)"><span>What are the trading fees?</span><span class="arrow">+</span></button>
+        <div class="faq-answer"><p>Maker fees are 0.08% and taker fees are 0.10%. High-volume traders receive discounts down to 0.01%. There are no deposit fees and crypto withdrawal fees vary by network.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)"><span>How long do withdrawals take?</span><span class="arrow">+</span></button>
+        <div class="faq-answer"><p>Crypto withdrawals are processed within 30 minutes after security confirmation. Bank transfers take 1-3 business days depending on your bank and jurisdiction.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)"><span>Is my account insured?</span><span class="arrow">+</span></button>
+        <div class="faq-answer"><p>95% of assets are stored in cold storage. Our hot wallet is covered by a $100M insurance policy. NEXUS maintains a Secure Asset Fund for Users (SAFU) worth $500M.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)"><span>How do I report a suspicious login?</span><span class="arrow">+</span></button>
+        <div class="faq-answer"><p>Immediately change your password, revoke all active sessions in Settings → Security → Active Sessions, and contact our security team at security@nexustrade.io. Enable 2FA if not already active.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)"><span>What countries are supported?</span><span class="arrow">+</span></button>
+        <div class="faq-answer"><p>NEXUS supports 52 countries. Unfortunately, services are not available to residents of the United States, North Korea, Iran, and other OFAC-sanctioned jurisdictions due to regulatory requirements.</p></div>
+      </div>
+    </div>
+
+    <!-- Contact form -->
+    <div>
+      <div class="contact-form">
+        <h2>Send Us a <span style="color:var(--cyan)">Message</span></h2>
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" class="form-control" placeholder="John Doe"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-control" placeholder="john@example.com"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <select class="form-control">
+            <option>Technical Issue</option>
+            <option>Account & Security</option>
+            <option>Deposits & Withdrawals</option>
+            <option>Trading Question</option>
+            <option>KYC Verification</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message</label>
+          <textarea class="form-control" placeholder="Describe your issue in detail..."></textarea>
+        </div>
+        <div class="captcha-box">
+          <input type="checkbox" id="supportCaptcha"/>
+          <label for="supportCaptcha">I'm not a robot — CAPTCHA v3</label>
+          <span class="captcha-icon">🛡️</span>
+        </div>
+        <button class="btn btn-primary" style="width:100%;padding:13px;" onclick="submitSupport()">Send Message →</button>
+        <div style="margin-top:16px;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);text-align:center;">
+          Average response time: &lt; 2 hours • Live chat available 24/7
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SETTINGS PAGE
+     ============================================================ -->
+<div class="page" id="page-settings">
+  <div class="section" style="padding-bottom:20px;">
+    <div class="section-title">Account <span>Settings</span></div>
+    <div class="section-subtitle">// USER_PREFERENCES</div>
+  </div>
+
+  <div class="settings-layout">
+    <div class="settings-nav">
+      <a href="#" class="active" onclick="return false;"><span class="icon">👤</span> Profile</a>
+      <a href="#" onclick="return false;"><span class="icon">🔐</span> Security</a>
+      <a href="#" onclick="return false;"><span class="icon">🔔</span> Notifications</a>
+      <a href="#" onclick="return false;"><span class="icon">💳</span> Payment</a>
+      <a href="#" onclick="return false;"><span class="icon">🌐</span> API Keys</a>
+      <a href="#" onclick="return false;"><span class="icon">⚙️</span> Preferences</a>
+    </div>
+
+    <div class="settings-content">
+      <!-- Profile card -->
+      <div class="settings-card">
+        <div class="card-header"><h3>Profile Information</h3></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" value="John"/>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" value="Trader"/>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:16px;">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" value="john@nexustrade.io"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Country</label>
+            <select class="form-control">
+              <option>United Kingdom</option>
+              <option>Germany</option>
+              <option>Singapore</option>
+              <option>Australia</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="showNotif('Profile updated successfully.','success','✅','Profile Saved')">Save Changes</button>
+        </div>
+      </div>
+
+      <!-- Security settings -->
+      <div class="settings-card">
+        <div class="card-header"><h3>Security Settings</h3></div>
+        <div class="card-body">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Two-Factor Authentication</h4>
+              <p>Require 2FA code for login and withdrawals</p>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on');showNotif('2FA setting updated.','info','🔐','Security')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Login Notifications</h4>
+              <p>Email alerts for new device logins</p>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Withdrawal Whitelist</h4>
+              <p>Only allow withdrawals to verified addresses</p>
+            </div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Anti-Phishing Code</h4>
+              <p>Show custom code on all NEXUS emails</p>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Session Timeout</h4>
+              <p>Auto-logout after 30 minutes of inactivity</p>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="settings-card">
+        <div class="card-header"><h3>Notification Preferences</h3></div>
+        <div class="card-body">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Price Alerts</h4>
+              <p>Notify when assets hit your target prices</p>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Order Fill Notifications</h4>
+              <p>Alert when your limit orders are filled</p>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Market News</h4>
+              <p>Breaking news affecting your portfolio</p>
+            </div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <h4>Weekly Portfolio Report</h4>
+              <p>Email summary every Monday</p>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ============================================================
+   MARKET DATA (simulated / demo)
+   ============================================================ */
+const marketData = [
+  { id:1, sym:'BTC', name:'Bitcoin', price:67420.50, change:2.34, high:68100, low:65800, vol:'$1.2B', cat:'crypto', color:'#F7931A' },
+  { id:2, sym:'ETH', name:'Ethereum', price:3442.80, change:1.87, high:3510, low:3380, vol:'$480M', cat:'crypto', color:'#627EEA' },
+  { id:3, sym:'SOL', name:'Solana', price:182.40, change:-0.92, high:188, low:179, vol:'$120M', cat:'crypto', color:'#9945FF' },
+  { id:4, sym:'BNB', name:'BNB Chain', price:598.20, change:0.45, high:604, low:590, vol:'$95M', cat:'crypto', color:'#F3BA2F' },
+  { id:5, sym:'ADA', name:'Cardano', price:0.7234, change:-1.23, high:0.74, low:0.71, vol:'$42M', cat:'crypto', color:'#0033AD' },
+  { id:6, sym:'AAPL', name:'Apple Inc.', price:214.60, change:0.78, high:216, low:212, vol:'$8.2B', cat:'stock', color:'#00ff88' },
+  { id:7, sym:'TSLA', name:'Tesla Inc.', price:248.90, change:-2.14, high:256, low:245, vol:'$4.1B', cat:'stock', color:'#cc0033' },
+  { id:8, sym:'NVDA', name:'NVIDIA Corp.', price:892.30, change:3.45, high:902, low:875, vol:'$12.4B', cat:'stock', color:'#76B900' },
+  { id:9, sym:'MSFT', name:'Microsoft', price:418.70, change:0.34, high:420, low:414, vol:'$5.8B', cat:'stock', color:'#00a4ef' },
+  { id:10, sym:'EUR/USD', name:'Euro / Dollar', price:1.0842, change:0.12, high:1.0870, low:1.0810, vol:'$42B', cat:'forex', color:'#ffd700' },
+  { id:11, sym:'GBP/USD', name:'Pound / Dollar', price:1.2743, change:-0.08, high:1.2780, low:1.2710, vol:'$28B', cat:'forex', color:'#ffd700' },
+  { id:12, sym:'USD/JPY', name:'Dollar / Yen', price:149.82, change:0.21, high:150.20, low:149.40, vol:'$34B', cat:'forex', color:'#ffd700' },
+];
+
+/* Simulate price updates */
+function randomWalk(price, pct=0.002) {
+  return price * (1 + (Math.random()-0.5)*pct);
+}
+setInterval(()=>{
+  marketData.forEach(d=>{
+    d.price = randomWalk(d.price);
+    d.change += (Math.random()-0.5)*0.1;
+    d.change = Math.max(-15, Math.min(15, d.change));
+  });
+  renderTicker();
+  if(document.getElementById('page-markets').classList.contains('active')) renderMarketTable();
+  if(document.getElementById('page-dashboard').classList.contains('active')) updateDashPrices();
+}, 3000);
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function navigate(page, e) {
+  if(e) e.preventDefault();
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  // Show target page
+  const target = document.getElementById('page-'+page);
+  if(target) target.classList.add('active');
+  // Update nav links
+  document.querySelectorAll('.nav-links a').forEach(a=>{
+    a.classList.toggle('active', a.id==='nav-'+page);
+  });
+  // Close mobile nav
+  document.getElementById('mobileNav').classList.remove('open');
+  // Scroll top
+  window.scrollTo(0,0);
+  // Page-specific init
+  if(page==='markets') initMarketsPage();
+  if(page==='dashboard') initDashboard();
+  return false;
+}
+
+function toggleMobileNav(){
+  document.getElementById('mobileNav').classList.toggle('open');
+}
+
+/* ============================================================
+   TICKER BAR
+   ============================================================ */
+function renderTicker(){
+  const items = [...marketData,...marketData].map(d=>`
+    <span class="ticker-item">
+      <span class="sym">${d.sym}</span>
+      <span class="price">${formatPrice(d.price, d.cat)}</span>
+      <span class="chg ${d.change>=0?'up':'down'}">${d.change>=0?'+':''}${d.change.toFixed(2)}%</span>
+    </span>
+  `).join('');
+  document.getElementById('tickerTrack').innerHTML = items;
+}
+renderTicker();
+
+/* ============================================================
+   HOME MARKET HIGHLIGHTS
+   ============================================================ */
+function renderHighlights(){
+  const top6 = marketData.slice(0,6);
+  const grid = document.getElementById('highlightCards');
+  if(!grid) return;
+  grid.innerHTML = top6.map(d=>`
+    <div class="card">
+      <div class="mkt-card-header">
+        <div>
+          <div class="mkt-card-sym" style="color:${d.color}">${d.sym}</div>
+          <div class="mkt-card-name">${d.name}</div>
+        </div>
+        <span class="mkt-card-badge badge-${d.cat}">${d.cat.toUpperCase()}</span>
+      </div>
+      <div class="mkt-price">${formatPrice(d.price, d.cat)}</div>
+      <div class="mkt-change ${d.change>=0?'up':'down'}">
+        ${d.change>=0?'▲':'▼'} ${Math.abs(d.change).toFixed(2)}% (24h)
+      </div>
+      <svg class="sparkline" viewBox="0 0 200 50" preserveAspectRatio="none">${genSparkline(d.change>=0)}</svg>
+    </div>
+  `).join('');
+}
+renderHighlights();
+
+function genSparkline(bullish){
+  const pts = [];
+  let y = 25;
+  for(let i=0;i<20;i++){
+    y += (Math.random()-0.45)*(bullish?4:4.5);
+    y = Math.max(5,Math.min(45,y));
+    pts.push(`${i*10.5},${y}`);
+  }
+  const path = 'M'+pts.join(' L');
+  const color = bullish ? '#00ff88' : '#ff3b5c';
+  const fill = pts.map((p,i)=>i===0?`M${p}`:`L${p}`).join(' ')+` L${(pts.length-1)*10.5},50 L0,50 Z`;
+  return `<defs><linearGradient id="sg${Math.random().toString(36).substr(2,5)}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.3"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+  <path d="${path}" fill="none" stroke="${color}" stroke-width="1.5"/>`;
+}
+
+/* ============================================================
+   MARKETS PAGE
+   ============================================================ */
+let currentCat = 'all';
+function initMarketsPage(){
+  renderMarketTable();
+  drawMainChart();
+}
+function filterMarket(cat, btn){
+  currentCat = cat;
+  document.querySelectorAll('.markets-tabs .tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMarketTable();
+}
+function renderMarketTable(){
+  const filtered = currentCat==='all' ? marketData : marketData.filter(d=>d.cat===currentCat);
+  const body = document.getElementById('marketTableBody');
+  if(!body) return;
+  body.innerHTML = filtered.map(d=>`
+    <tr>
+      <td style="color:var(--text-dim)">${d.id}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:${d.color}22;border:1px solid ${d.color}44;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${d.color}">${d.sym.slice(0,2)}</div>
+          <div>
+            <div class="sym">${d.sym}</div>
+            <div style="font-size:11px;color:var(--text-dim)">${d.name}</div>
+          </div>
+        </div>
+      </td>
+      <td>${formatPrice(d.price,d.cat)}</td>
+      <td class="${d.change>=0?'up':'down'}">${d.change>=0?'+':''}${d.change.toFixed(2)}%</td>
+      <td>${formatPrice(d.high,d.cat)}</td>
+      <td>${formatPrice(d.low,d.cat)}</td>
+      <td style="color:var(--text-secondary)">${d.vol}</td>
+      <td><span class="mkt-card-badge badge-${d.cat}">${d.cat.toUpperCase()}</span></td>
+      <td><button class="btn btn-ghost" style="padding:5px 12px;font-size:11px;" onclick="navigate('dashboard')">Trade</button></td>
+    </tr>
+  `).join('');
+}
+function drawMainChart(){
+  const svg = document.getElementById('mainChart');
+  if(!svg) return;
+  const w=900, h=260, pad=40;
+  const pts = [];
+  let p=260;
+  for(let i=0;i<=80;i++){
+    p += (Math.random()-0.47)*8;
+    p = Math.max(60,Math.min(220,p));
+    pts.push({x:pad+i*(w-2*pad)/80, y:p});
+  }
+  const pathD = pts.map((pt,i)=>i===0?`M${pt.x},${pt.y}`:`L${pt.x},${pt.y}`).join(' ');
+  const areaD = pathD+` L${pts[pts.length-1].x},${h-pad} L${pts[0].x},${h-pad} Z`;
+  svg.innerHTML=`<defs>
+    <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00c8ff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#00c8ff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="lnglow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  ${[1,2,3,4].map(i=>`<line x1="${pad}" y1="${pad+i*(h-2*pad)/4}" x2="${w-pad}" y2="${pad+i*(h-2*pad)/4}" stroke="rgba(0,200,255,0.05)" stroke-width="1"/>`).join('')}
+  <path d="${areaD}" fill="url(#cg)"/>
+  <path d="${pathD}" fill="none" stroke="#00c8ff" stroke-width="2" filter="url(#lnglow)"/>
+  <circle cx="${pts[pts.length-1].x}" cy="${pts[pts.length-1].y}" r="4" fill="#00c8ff" filter="url(#lnglow)"/>`;
+  // Timeframe button behavior
+  document.querySelectorAll('.tf-btn').forEach(b=>{
+    b.onclick=()=>{document.querySelectorAll('.tf-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');drawMainChart();};
+  });
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+const holdings = [
+  {sym:'BTC',name:'Bitcoin',qty:'0.358',val:24134,pnl:2340,pnlPct:10.7,color:'#F7931A'},
+  {sym:'ETH',name:'Ethereum',qty:'2.5',val:8607,pnl:-320,pnlPct:-3.6,color:'#627EEA'},
+  {sym:'SOL',name:'Solana',qty:'12',val:2189,pnl:87,pnlPct:4.1,color:'#9945FF'},
+  {sym:'NVDA',name:'NVIDIA',qty:'3',val:2677,pnl:143,pnlPct:5.6,color:'#76B900'},
+];
+const orders = [
+  {pair:'BTC/USDT',side:'BUY',amount:'$6,742',status:'FILLED',color:'var(--green)'},
+  {pair:'ETH/USDT',side:'SELL',amount:'$3,443',status:'FILLED',color:'var(--red)'},
+  {pair:'SOL/USDT',side:'BUY',amount:'$912',status:'PARTIAL',color:'var(--gold)'},
+  {pair:'NVDA/USD',side:'BUY',amount:'$892',status:'FILLED',color:'var(--green)'},
+  {pair:'BTC/USDT',side:'LIMIT',amount:'$5,000',status:'OPEN',color:'var(--cyan)'},
+];
+
+function initDashboard(){
+  renderHoldings();
+  renderOrders();
+  drawDashChart();
+  renderOrderBook();
+  updateOrderSummary();
+}
+function renderHoldings(){
+  const list = document.getElementById('holdingsList');
+  if(!list) return;
+  list.innerHTML = holdings.map(h=>`
+    <div class="holding-item">
+      <div class="holding-left">
+        <div class="holding-icon" style="background:${h.color}22;color:${h.color};border:1px solid ${h.color}44;">${h.sym.slice(0,2)}</div>
+        <div>
+          <div class="holding-sym">${h.sym}</div>
+          <div class="holding-qty">${h.qty} ${h.sym}</div>
+        </div>
+      </div>
+      <div class="holding-right">
+        <div class="holding-val">$${h.val.toLocaleString()}</div>
+        <div class="holding-pnl ${h.pnl>=0?'up':'down'}">${h.pnl>=0?'+':''}$${Math.abs(h.pnl)} (${h.pnlPct}%)</div>
+      </div>
+    </div>
+  `).join('');
+}
+function renderOrders(){
+  const tbody = document.getElementById('orderHistory');
+  if(!tbody) return;
+  tbody.innerHTML = orders.map(o=>`
+    <tr>
+      <td style="padding:10px 16px;border-bottom:1px solid rgba(0,200,255,0.04);color:var(--cyan)">${o.pair}</td>
+      <td style="padding:10px 16px;border-bottom:1px solid rgba(0,200,255,0.04);color:${o.color}">${o.side}</td>
+      <td style="padding:10px 16px;border-bottom:1px solid rgba(0,200,255,0.04);text-align:right;">${o.amount}</td>
+      <td style="padding:10px 16px;border-bottom:1px solid rgba(0,200,255,0.04);text-align:right;color:${o.color}">${o.status}</td>
+    </tr>
+  `).join('');
+}
+function drawDashChart(){
+  const svg = document.getElementById('dashChart');
+  if(!svg) return;
+  const w=700,h=220,pad=20;
+  const pts=[];let p=110;
+  for(let i=0;i<=100;i++){p+=(Math.random()-0.47)*5;p=Math.max(30,Math.min(190,p));pts.push({x:pad+i*(w-2*pad)/100,y:p});}
+  const pathD=pts.map((pt,i)=>i===0?`M${pt.x},${pt.y}`:`L${pt.x},${pt.y}`).join(' ');
+  const areaD=pathD+` L${pts[pts.length-1].x},${h-pad} L${pts[0].x},${h-pad} Z`;
+  svg.innerHTML=`<defs>
+    <linearGradient id="dcg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00c8ff" stop-opacity="0.2"/><stop offset="100%" stop-color="#00c8ff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="dglow"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  ${[1,2,3].map(i=>`<line x1="${pad}" y1="${pad+i*(h-2*pad)/3}" x2="${w-pad}" y2="${pad+i*(h-2*pad)/3}" stroke="rgba(0,200,255,0.05)" stroke-width="1"/>`).join('')}
+  <path d="${areaD}" fill="url(#dcg)"/>
+  <path d="${pathD}" fill="none" stroke="#00c8ff" stroke-width="1.8" filter="url(#dglow)"/>
+  <circle cx="${pts[pts.length-1].x}" cy="${pts[pts.length-1].y}" r="3.5" fill="#00c8ff"/>`;
+}
+function updateDashChart(){ drawDashChart(); }
+function updateDashPrices(){
+  const btc = marketData[0];
+  const el = document.getElementById('dashPrice');
+  const chEl = document.getElementById('dashChange');
+  if(el){ el.textContent='$'+btc.price.toFixed(2); }
+  if(chEl){ chEl.textContent=(btc.change>=0?'+':'')+btc.change.toFixed(2)+'%'; chEl.style.color=btc.change>=0?'var(--green)':'var(--red)'; }
+  const mktEl = document.getElementById('mktChartPrice');
+  if(mktEl) mktEl.textContent='$'+btc.price.toFixed(2);
+}
+function renderOrderBook(){
+  const asks=[], bids=[];
+  let ap=67445, bp=67420;
+  for(let i=0;i<8;i++){
+    ap+=Math.random()*5+1;
+    const amt=(Math.random()*2+0.1).toFixed(4);
+    asks.push({price:ap.toFixed(2),amt,total:(ap*amt).toFixed(0)});
+  }
+  for(let i=0;i<8;i++){
+    bp-=Math.random()*5+1;
+    const amt=(Math.random()*2+0.1).toFixed(4);
+    bids.push({price:bp.toFixed(2),amt,total:(bp*amt).toFixed(0)});
+  }
+  asks.sort((a,b)=>b.price-a.price);
+  const maxVol=Math.max(...[...asks,...bids].map(r=>parseFloat(r.amt)));
+  const obAsks=document.getElementById('obAsks');
+  const obBids=document.getElementById('obBids');
+  if(obAsks) obAsks.innerHTML=asks.map(r=>`
+    <div class="ob-row ask">
+      <span class="price">${r.price}</span>
+      <span style="text-align:center">${r.amt}</span>
+      <span style="text-align:right">$${parseInt(r.total).toLocaleString()}</span>
+      <div class="depth-bar" style="width:${(parseFloat(r.amt)/maxVol*100).toFixed(0)}%"></div>
+    </div>`).join('');
+  if(obBids) obBids.innerHTML=bids.map(r=>`
+    <div class="ob-row bid">
+      <span class="price">${r.price}</span>
+      <span style="text-align:center">${r.amt}</span>
+      <span style="text-align:right">$${parseInt(r.total).toLocaleString()}</span>
+      <div class="depth-bar" style="width:${(parseFloat(r.amt)/maxVol*100).toFixed(0)}%"></div>
+    </div>`).join('');
+}
+setInterval(()=>{ if(document.getElementById('page-dashboard').classList.contains('active')) renderOrderBook(); }, 4000);
+
+/* Trade form */
+let currentTradeTab = 'buy';
+function switchTradeTab(type, btn){
+  currentTradeTab=type;
+  document.querySelectorAll('.trade-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const buyBtn=document.getElementById('buyBtn');
+  if(type==='buy'){ buyBtn.className='btn btn-success'; buyBtn.textContent='Place Buy Order'; buyBtn.style.width='100%'; buyBtn.style.padding='14px'; }
+  else { buyBtn.className='btn btn-danger'; buyBtn.textContent='Place Sell Order'; buyBtn.style.width='100%'; buyBtn.style.padding='14px'; }
+}
+document.getElementById('orderType')?.addEventListener('change', function(){
+  document.getElementById('limitPriceGroup').style.display = this.value==='Market Order'?'none':'block';
+});
+function updateOrderSummary(){
+  const amt = parseFloat(document.getElementById('tradeAmount')?.value||0.01);
+  const price = 67420;
+  const total = amt*price;
+  const fee = total*0.001;
+  document.getElementById('sumAmount').textContent=`${amt} BTC`;
+  document.getElementById('sumPrice').textContent='$'+price.toLocaleString();
+  document.getElementById('sumFee').textContent='$'+fee.toFixed(2);
+  document.getElementById('sumTotal').textContent='$'+(total+fee).toFixed(2);
+}
+function setPercent(pct){
+  const maxBTC = 8420/67420;
+  document.getElementById('tradeAmount').value=(maxBTC*pct/100).toFixed(5);
+  updateOrderSummary();
+}
+function placeOrder(){
+  const amt = document.getElementById('tradeAmount')?.value||'0.01';
+  const side = currentTradeTab==='buy'?'BUY':'SELL';
+  showNotif(`${side} order placed: ${amt} BTC at market price.`, side==='BUY'?'success':'error', side==='BUY'?'✅':'📉', 'Order Placed');
+}
+function addAlert(){
+  showNotif('Price alert feature: set threshold above/below current price.','info','🔔','Price Alert');
+}
+
+/* ============================================================
+   AUTH
+   ============================================================ */
+let loginAttempts=0;
+function handleLogin(){
+  const email=document.getElementById('loginEmail')?.value;
+  const pass=document.getElementById('loginPass')?.value;
+  if(!email||!pass){ showNotif('Please enter your credentials.','error','⚠️','Login Error'); return; }
+  loginAttempts++;
+  if(loginAttempts>=5){ showNotif('Too many attempts. Account temporarily locked. (Rate limited)','error','🚫','Locked'); return; }
+  showNotif('Authenticating securely...','info','🔐','Security Check');
+  setTimeout(()=>{ navigate('dashboard'); showNotif('Welcome back, John! Login secured.','success','✅','Authenticated'); loginAttempts=0; },1200);
+}
+function handleRegister(){
+  const captcha=document.getElementById('captchaCheck')?.checked;
+  const terms=document.getElementById('terms')?.checked;
+  if(!captcha){ showNotif('Please complete the CAPTCHA verification.','error','🤖','CAPTCHA Required'); return; }
+  if(!terms){ showNotif('Please accept the Terms of Service.','error','⚠️','Required'); return; }
+  showNotif('Creating your secure account...','info','🔐','Processing');
+  setTimeout(()=>{ navigate('login'); showNotif('Account created! Please login with your credentials.','success','✅','Account Created'); },1200);
+}
+function togglePass(id, btn){
+  const inp=document.getElementById(id);
+  if(inp){ inp.type=inp.type==='password'?'text':'password'; btn.textContent=inp.type==='password'?'👁':'🙈'; }
+}
+function nextDigit(inp, idx){
+  const digits=document.querySelectorAll('.twofa-digit');
+  if(inp.value && idx<5) digits[idx+1]?.focus();
+}
+function checkStrength(val){
+  const fill=document.getElementById('strengthFill');
+  const label=document.getElementById('strengthLabel');
+  if(!fill) return;
+  let score=0;
+  if(val.length>=8) score++;
+  if(val.length>=12) score++;
+  if(/[A-Z]/.test(val)) score++;
+  if(/[0-9]/.test(val)) score++;
+  if(/[^A-Za-z0-9]/.test(val)) score++;
+  const pct=(score/5)*100;
+  fill.style.width=pct+'%';
+  const colors=['#ff3b5c','#ff8c00','#ffd700','#00c8ff','#00ff88'];
+  const labels=['Very Weak','Weak','Fair','Strong','Very Strong'];
+  fill.style.background=colors[Math.min(score-1,4)]||colors[0];
+  label.textContent='Strength: '+(labels[Math.min(score-1,4)]||'Very Weak');
+  label.style.color=colors[Math.min(score-1,4)]||colors[0];
+}
+function checkCaptcha(cb){
+  if(cb.checked) showNotif('CAPTCHA verification passed.','success','✅','Verified');
+}
+
+/* ============================================================
+   SUPPORT
+   ============================================================ */
+function toggleFaq(btn){
+  const item=btn.parentElement;
+  item.classList.toggle('open');
+}
+function submitSupport(){
+  const cap=document.getElementById('supportCaptcha')?.checked;
+  if(!cap){ showNotif('Please verify you are not a robot.','error','🤖','CAPTCHA Required'); return; }
+  showNotif('Message sent! Our team will respond within 2 hours.','success','✅','Ticket Created');
+}
+
+/* ============================================================
+   NOTIFICATION SYSTEM
+   ============================================================ */
+function showNotif(msg, type='info', icon='ℹ️', title='Notice'){
+  const container=document.getElementById('notifContainer');
+  const notif=document.createElement('div');
+  notif.className=`notif ${type}`;
+  notif.innerHTML=`
+    <span class="notif-icon">${icon}</span>
+    <div class="notif-text">
+      <div class="notif-title">${title}</div>
+      <div class="notif-msg">${msg}</div>
+    </div>
+    <button class="notif-close" onclick="this.parentElement.remove()">×</button>
+  `;
+  container.appendChild(notif);
+  setTimeout(()=>notif.remove(), 4500);
+}
+
+/* ============================================================
+   PRICE ALERT DEMO
+   ============================================================ */
+setTimeout(()=>{
+  showNotif('BTC surged past $67,400 — watch for resistance at $68K.','warning','📈','Price Alert');
+},3000);
+
+/* ============================================================
+   HELPER
+   ============================================================ */
+function formatPrice(price, cat){
+  if(cat==='forex') return price.toFixed(4);
+  if(price>100) return '$'+price.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  return '$'+price.toFixed(4);
+}
+
+/* Fix sparkline string template literal issue */
+(function fixSparkline(){
+  if(document.getElementById('highlightCards')&&document.getElementById('highlightCards').innerHTML===''){
+    renderHighlights();
+  }
+})();
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded',()=>{
+  renderTicker();
+  renderHighlights();
+  showNotif('Platform secured. All systems operational.','success','🛡️','Security Status');
+});
+</script>
+</body>
+</html>
